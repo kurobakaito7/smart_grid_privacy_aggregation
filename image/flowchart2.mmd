@@ -1,0 +1,16 @@
+flowchart TD
+    A([开始]) --> B["输入<br/>数据: [d1,d2,d3,d4,d5]<br/>序列: [a1,a2,a3,a4,a5]"]
+
+    B --> C[M = 0]
+    C --> D{i ≤ 5?}
+
+    D -->|是| E["M = M + d_i × a_i<br/>i = i + 1"]
+    E --> D
+
+    D -->|否| F["输出<br/>M = Σ(d_i × a_i)"]
+
+    F --> G([结束])
+
+    style B fill:#74c0fc
+    style C fill:#f8f8f8
+    style F fill:#51cf66

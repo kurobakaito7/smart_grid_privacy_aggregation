@@ -1,0 +1,22 @@
+flowchart TD
+    A([开始]) --> B["收到报文(deviceId, seq, timestamp)"]
+
+    B --> C["读取 last_seq[deviceId]"]
+
+    C --> D{seq ≤ last_seq}
+
+    D -->|是| E["拒绝报文-重放攻击日志"]
+    D -->|否| F{"timestamp时间戳检查"}
+
+    F -->|超时| G["拒绝报文-时间戳超限日志"]
+    F -->|正常| H["更新last_seq[deviceId]=seq"]
+
+    H --> I["进入正常验签流程"]
+
+    E --> J([结束])
+    G --> J
+    I --> J
+
+    style E fill:#ff6b6b
+    style G fill:#ff6b6b
+    style I fill:#51cf66

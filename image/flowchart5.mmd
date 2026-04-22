@@ -1,0 +1,50 @@
+flowchart TD
+    subgraph 数据准备
+        A1["用户A选择整数对<br/>(m1, m2)"]
+        B1["用户B选择整数对<br/>(n1, n2)"]
+    end
+
+    subgraph 密钥生成
+        A2["用户A生成密钥对<br/>(pkA, skA)"]
+        B2["用户B生成密钥对<br/>(pkB, skB)"]
+    end
+
+    subgraph 加密
+        A3["用户A用pkA加密<br/>(c1, c2) = Enc(m1, m2)"]
+        B3["用户B用pkB加密<br/>(d1, d2) = Enc(n1, n2)"]
+    end
+
+    subgraph 密文乘法
+        C["c = c1 ⊗ c2<br/>d = d1 ⊗ d2"]
+    end
+
+    subgraph 密文比较
+        D["e = equal(c, d)"]
+    end
+
+    subgraph 密文传输
+        E["发送(c, d, e)给第三方T"]
+    end
+
+    subgraph 验证输出
+        F["T解密(c, d)"]
+        G["e' = equal(m1×n1, m2×n2)"]
+        H{"e = e'?"}
+        I["输出验证通过"]
+        J["输出验证失败"]
+    end
+
+    A1 & B1 --> A2 & B2
+    A2 --> A3
+    B2 --> B3
+    A3 & B3 --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H -->|是| I
+    H -->|否| J
+
+    style I fill:#51cf66
+    style J fill:#ff6b6b

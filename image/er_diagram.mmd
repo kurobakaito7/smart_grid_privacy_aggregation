@@ -1,0 +1,57 @@
+erDiagram
+    DEVICE {
+        string device_id PK "设备ID"
+        string public_key "设备公钥"
+        string status "设备状态"
+        datetime last_report_time "最后上报时间"
+        int last_seq "最后序列号"
+        datetime register_time "注册时间"
+    }
+
+    REPORT_LOG {
+        string log_id PK "日志ID"
+        string device_id FK "设备ID"
+        datetime timestamp "时间戳"
+        int seq "序列号"
+        string ciphertext "密文"
+        string ciphertext_sq "密文平方"
+        string signature "签名"
+        string verify_result "验签结果"
+        string reject_reason "拒绝原因"
+    }
+
+    AGGREGATION {
+        string agg_id PK "聚合ID"
+        datetime window_start "窗口开始时间"
+        datetime window_end "窗口结束时间"
+        int participant_cnt "参与者数量"
+        string participant_list "参与者列表JSON"
+        int sum_power "功率总和"
+        int sum_voltage "电压总和"
+        int sum_current "电流总和"
+        string verify_result "验签结果"
+        datetime create_time "创建时间"
+    }
+
+    FOG_SIGNATURE {
+        string signature_id PK "签名ID"
+        string agg_id FK "聚合ID(唯一)"
+        string signature "雾节点签名"
+        datetime sign_time "签名时间"
+    }
+
+    AUDIT_LOG {
+        string audit_id PK "审计ID"
+        datetime event_time "事件时间"
+        string level "日志级别"
+        string module "模块"
+        string device_id "设备ID"
+        string event_type "事件类型"
+        string message "消息"
+        json detail "详情JSON"
+    }
+
+    DEVICE ||--o{ REPORT_LOG : "1:N"
+    DEVICE }o--o{ AGGREGATION : "N:M"
+    AGGREGATION ||--|| FOG_SIGNATURE : "1:1"
+    AUDIT_LOG }o--o| DEVICE : "关联设备"

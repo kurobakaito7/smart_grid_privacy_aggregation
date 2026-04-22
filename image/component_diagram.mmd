@@ -1,0 +1,42 @@
+flowchart TB
+    subgraph App["App.js"]
+        subgraph TimeWindowSelector["TimeWindowSelector"]
+            A1["开始时间"]
+            A2["结束时间"]
+            A3["查询按钮"]
+        end
+
+        subgraph DeviceTable["DeviceTable"]
+            B1["设备列表"]
+            B2["多选框"]
+        end
+
+        subgraph Charts["AggregationChart ×3"]
+            C1["功率趋势图"]
+            C2["电压趋势图"]
+            C3["电流趋势图"]
+        end
+
+        subgraph StatusCard["StatusCard"]
+            D1["签名状态"]
+            D2["更新时间"]
+        end
+    end
+
+    A3 -->|1. 用户点击查询| B1
+    B2 -->|2. selectedDevices| E1["fetchAggregation API"]
+    E1 -->|3. 聚合数据| F1["更新state"]
+    F1 -->|4. xAxisData seriesData| C1
+    F1 -->|4. xAxisData seriesData| C2
+    F1 -->|4. xAxisData seriesData| C3
+    F1 -->|5. signValid| D1
+    F1 -->|5. 更新时间| D2
+
+    E1 -.->|调用| G["控制中心"]
+
+    style App fill:#e7f5ff
+    style TimeWindowSelector fill:#d0ebff
+    style DeviceTable fill:#d0ebff
+    style Charts fill:#d0ebff
+    style StatusCard fill:#d0ebff
+    style G fill:#fff3bf

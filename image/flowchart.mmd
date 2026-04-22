@@ -1,0 +1,26 @@
+flowchart TD
+    subgraph 接收阶段
+        A([开始]) --> B[接收HTTP请求<br/>解析JSON<br/>校验deviceId]
+    end
+
+    subgraph 验签阶段
+        B --> C[提取timestamp<br/>seq cipher<br/>signature]
+        C --> D[拼接签名原文<br/>deviceId_timestamp<br/>seq_cipher<br/>cipherSq]
+        D --> E[查询设备公钥<br/>调用SchnorrVerify]
+    end
+
+    subgraph 验签结果
+        E --> F{验签通过}
+        F -->|否| F1([验签失败])
+        F -->|是| G{seq大于<br/>last_seq}
+    end
+
+    subgraph 处理阶段
+        G -->|否| G1([重放攻击])
+        G -->|是| H[更新last_seq<br/>加入聚合缓冲区<br/>返回200 OK]
+        H --> I([结束])
+    end
+
+    style F1 fill:#ff6b6b
+    style G1 fill:#ff6b6b
+    style H fill:#51cf66

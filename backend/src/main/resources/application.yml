@@ -1,0 +1,58 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: smart-grid-privacy-system
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/smartgrid_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+    username: root
+    password: k2136267433
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+    sql:
+      init:
+        mode: always
+
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss.SSS
+
+smartgrid:
+  meter:
+    count: 10
+  report:
+    interval: 60000
+  aggregate:
+    window: 300000
+  paillier:
+    key-length: 1024
+  replay:
+    time-window-ms: 300000
+  audit:
+    retention-days: 90
+
+jwt:
+  secret: mySecretKeyForJWTTokenGeneration123456789012345678901234567890
+  expiration: 86400000
+
+logging:
+  level:
+    com.smartgrid: INFO
+    org.springframework.security: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

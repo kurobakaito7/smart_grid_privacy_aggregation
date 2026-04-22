@@ -1,0 +1,17 @@
+flowchart TD
+    A([开始]) --> B["输入<br/>M: 打包整数<br/>序列: [a1,a2,a3,a4,a5]"]
+
+    B --> C["data = [0,0,0,0,0]"]
+
+    C --> D{i >= 1?}
+
+    D -->|是| E["data[i] = floor(M / a_i)<br/>M = M mod a_i<br/>i = i - 1"]
+    E --> D
+
+    D -->|否| F["输出<br/>data = [d1,d2,d3,d4,d5]"]
+
+    F --> G([结束])
+
+    style B fill:#74c0fc
+    style C fill:#f8f8f8
+    style F fill:#51cf66
