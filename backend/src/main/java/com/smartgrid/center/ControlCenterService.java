@@ -27,10 +27,35 @@ public class ControlCenterService {
     @Autowired
     private AuditLogger auditLogger;
 
+    @Autowired
+    private FogSignatureVerifier fogSignatureVerifier;
+
     private final DataPacker dataPacker = new DataPacker(DataPacker.generateDefaultMaxValues());
 
     public StatisticsResponse processAggregation(AggregationRequest request) {
+        boolean signatureVerified = false;
         try {
+            String message = String.format("%s|%s|%s|%s|%d|%s",
+                    "AGG-" + request.getWindowStart().toString() + "-" + request.getWindowEnd().toString(),
+                    request.getWindowStart().toString(),
+                    request.getWindowEnd().toString(),
+                    request.getSumCiphertext(),
+                    request.getParticipantCount(),
+                    request.getParticipantList());
+
+            signatureVerified = fogSignatureVerifier.verifyAggregationSignature(
+                    request.getWindowStart().toString(),
+                    request.getWindowEnd().toString(),
+                    request.getSumCiphertext(),
+                    request.getParticipantCount(),
+                    request.getParticipantList(),
+                    request.getFogSignature());
+
+            if (!signatureVerified) {
+                auditLogger.logSecurityEvent("CONTROL_CENTER", null, "SIGNATURE_VERIFICATION_FAILED",
+                        "Fog signature verification failed for aggregation window: " + request.getWindowStart());
+            }
+
             BigInteger sumCiphertext = new BigInteger(request.getSumCiphertext(), 16);
             BigInteger sumSqCiphertext = new BigInteger(request.getSumSqCiphertext(), 16);
 
@@ -54,7 +79,7 @@ public class ControlCenterService {
             aggregation.setSumVoltage(BigDecimal.valueOf(sumValues[0]));
             aggregation.setSumCurrent(BigDecimal.valueOf(sumValues[1]));
             aggregation.setFogSignature(request.getFogSignature());
-            aggregation.setVerifyResult(true);
+            aggregation.setVerifyResult(signatureVerified);
             aggregationRepository.save(aggregation);
 
             auditLogger.logSecurityEvent("CONTROL_CENTER", null, "AGGREGATION_RECEIVED",
@@ -71,7 +96,7 @@ public class ControlCenterService {
             response.setVarVoltage(stats[6]);
             response.setVarCurrent(stats[7]);
             response.setVarPower(stats[8]);
-            response.setSignatureVerified(true);
+            response.setSignatureVerified(signatureVerified);
 
             return response;
         } catch (Exception e) {

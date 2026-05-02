@@ -1,0 +1,41 @@
+flowchart LR
+    subgraph Init["系统初始化"]
+        A([开始]) --> B[控制中心生成<br/>Paillier密钥]
+        B --> C[电表注册公钥]
+        C --> D[分发公钥到雾节点]
+    end
+
+    subgraph Terminal["终端上报 - 电表"]
+        D --> E[采集多维数据]
+        E --> F[超递增编码]
+        F --> G[Paillier加密]
+        G --> H[Schnorr签名]
+    end
+
+    subgraph Fog["雾端聚合与转发 - 雾节点"]
+        H --> |HTTP/JSON| I[接收请求]
+        I --> J[验证签名]
+        J --> K[重放检测]
+        K --> L[同态聚合]
+        L --> M[雾端签名]
+    end
+
+    subgraph Center["控制中心处理"]
+        M --> N[验证雾签名]
+        N --> O[Paillier解密]
+        O --> P[解码与统计]
+        P --> Q[存储结果]
+    end
+
+    subgraph Frontend["前端展示"]
+        Q --> R[查询统计接口]
+        R --> S[图表展示]
+        S --> T[验签状态显示]
+        T --> U([结束])
+    end
+
+    style Init fill:#e3f2fd,stroke:#1976d2
+    style Terminal fill:#fff3e0,stroke:#f57c00
+    style Fog fill:#e8f5e9,stroke:#388e3c
+    style Center fill:#fce4ec,stroke:#c2185b
+    style Frontend fill:#f3e5f5,stroke:#7b1fa2
